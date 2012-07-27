@@ -85,7 +85,7 @@ SECRET_KEY = 'g2@f#pca(&amp;=r!&amp;o04eii85mwm9t0q8smer&amp;pqysjnjh@y(9+@2'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'jingo.Loader',
+    #'jingo.Loader',
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
@@ -124,7 +124,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 
-    'curator.models',
+    'curator.blueprints',
 )
 
 # A sample logging configuration. The only tangible logging

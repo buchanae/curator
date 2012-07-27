@@ -5,19 +5,23 @@ from django.core.management.base import BaseCommand, CommandError
 from lxml import etree
 from lxml import objectify
 
-from curator.models.models import Model, Product, Reaction, Reactant, Species
+from curator.blueprints.models import Blueprint, Product, Reaction, Reactant, Species
 
 class Command(BaseCommand):
     args = '<sbml>'
     help = 'Import an SBML model'
 
-    def handle(self, model_name, sbml_path, **options):
+    def handle(self, blueprint_name, sbml_path, **options):
 
         xml = objectify.parse(sbml_path)
 
         # TODO try to detect SEED and Biocyc models, handle appropriately
-        model = Model(name=model_name)
-        model.save()
+        # TODO actual parameter parsing
+        # TODO change command name 'import_sbml', 'import_blueprint', or something
+        #      to avoid name collisions and ambiguity
+
+        blueprint = Blueprint(name=blueprint_name)
+        blueprint.save()
 
         # SBML species ID to Species object dictionary
         species_objects = {}
@@ -54,7 +58,7 @@ class Command(BaseCommand):
             reaction_name = reaction_xml.get('name')
             reversible = bool(reaction_xml.get('reversible'))
 
-            r = Reaction(name=reaction_name, reversible=reversible, model=model)
+            r = Reaction(name=reaction_name, reversible=reversible, blueprint=blueprint)
             r.save()
 
             try:
@@ -92,3 +96,25 @@ class Command(BaseCommand):
                                        species=species)
             except AttributeError:
                 pass
+
+            parameters_transformations = {
+                'lower_bound': int,
+                'upper_bound': int,
+                'objective_coefficient': float,
+                'flux_value': float,
+            }
+
+            try:
+                parameters = {}
+                for parameter in reaction_xml.kineticLaw.listofParameters.parameter:
+                    ID = parameter.get('id').lower()
+                    try:
+                        transformation = parameters_transformations[ID]
+                        setattr(r, ID, transformation(parameter.get('value')))
+                    except KeyError:
+                        pass
+
+            except AttributeError:
+                pass
+
+            r.save()
