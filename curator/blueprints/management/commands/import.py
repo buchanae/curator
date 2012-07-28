@@ -7,13 +7,37 @@ from lxml import objectify
 
 from curator.blueprints.models import Blueprint, Product, Reaction, Reactant, Species
 
+
+def multi_getattr(obj, attr, default = None):
+    """
+    Get a named attribute from an object; multi_getattr(x, 'a.b.c.d') is
+    equivalent to x.a.b.c.d. When a default argument is given, it is
+    returned when any attribute in the chain doesn't exist; without
+    it, an exception is raised when a missing attribute is encountered.
+
+    """
+    attributes = attr.split(".")
+    for i in attributes:
+        try:
+            obj = getattr(obj, i)
+        except AttributeError:
+            if default != None:
+                return default
+            else:
+                raise
+    return obj
+
+
 class Command(BaseCommand):
     args = '<sbml>'
     help = 'Import an SBML model'
 
+    def message(self, msg):
+        print(msg, file=self.stderr)
+
     def handle(self, blueprint_name, sbml_path, **options):
 
-        xml = objectify.parse(sbml_path)
+        xml = objectify.parse(sbml_path).getroot().model
 
         # TODO try to detect SEED and Biocyc models, handle appropriately
         # TODO actual parameter parsing
@@ -26,7 +50,7 @@ class Command(BaseCommand):
         # SBML species ID to Species object dictionary
         species_objects = {}
 
-        for species_xml in xml.getroot().model.listOfSpecies.species:
+        for species_xml in multi_getattr(xml, 'listOfSpecies.species', []):
 
             SID = species_xml.get('id')
             raw_name = species_xml.get('name')
@@ -53,68 +77,69 @@ class Command(BaseCommand):
             species_objects[SID] = s
 
 
-        for reaction_xml in xml.getroot().model.listOfReactions.reaction:
+        def save_reaction_species(cls, reaction, refs):
+            '''
+            Parse reaction species xml, then create and save a ReactionSpecies model
+            using this data.
 
-            reaction_name = reaction_xml.get('name')
-            reversible = bool(reaction_xml.get('reversible'))
+            e.g.
+            >>> save_reaction_species(Reactant, reaction_obj, reactants_xml_iterable)
 
-            r = Reaction(name=reaction_name, reversible=reversible, blueprint=blueprint)
-            r.save()
+            This little helper saves some code duplication, since Reactants and Products
+            are so similar.
+            '''
 
-            try:
-                for reactant_xml in reaction_xml.listOfReactants.speciesReference:
+            # a whitelist of ReactionSpecies field names
+            # that are allowed to be set from xml-attribute-getting-magic below
+            valid_fields = ('compartment', 'stoichiometry', 'species')
 
-                    compartment = reactant_xml.get('compartment')
-                    stoichiometry = float(reactant_xml.get('stoichiometry'))
+            for species in refs:
+                try:
+                    d = dict(species.items())
 
-                    try:
-                        species = species_objects[reactant_xml.get('species')]
-                    except KeyError:
-                        # TODO print failure message
-                        continue
+                    # use our whitelist to remove any attributes we don't want to set
+                    # e.g. 'id'
+                    d = dict((k, v) for k, v in d.items() if k in valid_fields)
 
-                    r.reactants.create(compartment=compartment,
-                                       stoichiometry=stoichiometry,
-                                       species=species)
-            except AttributeError:
-                pass
+                    d['species'] = species_objects[d['species']]
+                    cls(reaction=reaction, **d).save()
 
-            try:
-                for product_xml in reaction_xml.listOfProducts.speciesReference:
+                except KeyError:
+                    self.message('Missing species.  Was looking for ' + d['species'])
 
-                    compartment = product_xml.get('compartment')
-                    stoichiometry = float(product_xml.get('stoichiometry'))
+                except AttributeError as e:
+                    self.message(e)
 
-                    try:
-                        species = species_objects[product_xml.get('species')]
-                    except KeyError:
-                        # TODO print failure message
-                        continue
 
-                    r.products.create(compartment=compartment,
-                                       stoichiometry=stoichiometry,
-                                       species=species)
-            except AttributeError:
-                pass
+        # a whitelist of Reaction field names
+        # that are allowed to be set from xml-attribute-getting-magic below
+        valid_fields = ('name', 'lower_bound', 'upper_bound', 'objective_coefficient',
+                        'reversible', 'flux_value')
 
-            parameters_transformations = {
-                'lower_bound': int,
-                'upper_bound': int,
-                'objective_coefficient': float,
-                'flux_value': float,
-            }
+        for reaction_xml in multi_getattr(xml, 'listOfReactions.reaction', []):
 
-            try:
-                parameters = {}
-                for parameter in reaction_xml.kineticLaw.listofParameters.parameter:
-                    ID = parameter.get('id').lower()
-                    try:
-                        transformation = parameters_transformations[ID]
-                        setattr(r, ID, transformation(parameter.get('value')))
-                    except KeyError:
-                        pass
+            # a little magic to easily get a bunch of xml parameters.
+            # getting them one-by-one is too verbose
+            # (check for existence, get attribute, set default)
+            d = dict(reaction_xml.items())
 
-            except AttributeError:
-                pass
+            parameters_xml = multi_getattr(reaction_xml,
+                                           'kineticLaw.listOfParameters.parameter')
+            d.update(dict((x.get('id').lower(), x.get('value')) for x in parameters_xml))
 
-            r.save()
+            # use our whitelist to remove any attributes we don't want to set
+            # e.g. 'id'
+            d = dict((k, v) for k, v in d.items() if k in valid_fields)
+
+            reaction = Reaction(blueprint=blueprint, **d)
+            reaction.save()
+
+            reactants_xml = multi_getattr(reaction_xml,
+                                          'listOfReactants.speciesReference', [])
+            products_xml = multi_getattr(reaction_xml,
+                                         'listOfProducts.speciesReference', [])
+
+            save_reaction_species(Reactant, reaction, reactants_xml)
+            save_reaction_species(Product, reaction, products_xml)
+
+            reaction.save()

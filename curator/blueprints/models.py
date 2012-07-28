@@ -16,11 +16,11 @@ class ReactionSpecies(models.Model):
         abstract = True
 
     COMPARTMENTS = (
-        ('e', 'Extra Cellular'),
-        ('c', 'Cytosol'),
+        ('extra_cellular', 'Extra Cellular'),
+        ('cytosol', 'Cytosol'),
     )
-    compartment = models.CharField(max_length=1, choices=COMPARTMENTS)
-    stiochiometry = models.FloatField(default=0.0)
+    compartment = models.CharField(max_length=50, default='cytosol', choices=COMPARTMENTS)
+    stoichiometry = models.FloatField(default=0.0)
     species = models.ForeignKey('Species')
     reaction = models.ForeignKey('Reaction')
 
@@ -30,17 +30,17 @@ class Product(ReactionSpecies): pass
     
 
 class Reaction(models.Model):
-    blueprint = models.ForeignKey('Blueprint')
-
-    name = models.CharField(max_length=100)
-    reversible = models.BooleanField(default=False)
+    blueprint = models.ForeignKey('Blueprint', related_name='reactions')
 
     reactants = models.ManyToManyField('Species', related_name='reactants',
                                        through='Reactant')
+
     products = models.ManyToManyField('Species', related_name='products',
                                       through='Product')
 
+    name = models.CharField(max_length=100)
+    reversible = models.BooleanField(default=False)
     lower_bound = models.IntegerField(default=0)
     upper_bound = models.IntegerField(default=0)
-    objective_coefficent = models.FloatField(default=0.0)
+    objective_coefficient = models.FloatField(default=0.0)
     flux_value = models.FloatField(default=0.0)
