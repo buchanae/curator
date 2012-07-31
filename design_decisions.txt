@@ -1,0 +1,3 @@
+
+separation between model and simulation details (objective coeffs, flux constraints, knockouts, etc) or same entity?
+  same entity

@@ -68,12 +68,8 @@ class Command(BaseCommand):
             if formula == 'noformula':
                 formula = ''
 
-            try:
-                s = Species.objects.get(name=name)
-            except Species.DoesNotExist:
-                s = Species(name=name, formula=formula)
-                s.save()
-
+            s = Species(blueprint=blueprint, name=name, formula=formula)
+            s.save()
             species_objects[SID] = s
 
 
@@ -105,6 +101,7 @@ class Command(BaseCommand):
                     cls(reaction=reaction, **d).save()
 
                 except KeyError:
+                    # TODO better error message
                     self.message('Missing species.  Was looking for ' + d['species'])
 
                 except AttributeError as e:
@@ -143,3 +140,5 @@ class Command(BaseCommand):
             save_reaction_species(Product, reaction, products_xml)
 
             reaction.save()
+
+        # TODO print url to blueprint resource

@@ -1,0 +1,81 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+
+@import "compass/reset";
+@import "compass";
+@import "blueprint";
+
+header.blueprint-header {
+  background-color: #bbb;
+  color: #f8f8f8;
+  padding: 3px 5px;
+  margin-bottom: 20px;
+
+  h1 {
+    font-size: 1.1em;
+  }
+}
+
+.reaction {
+
+  width: 95%;
+  margin: 20px auto;
+
+  header h1 {
+    font-size: 1.2em;
+    padding: 10px 0 5px 0;
+    margin-bottom: 5px;
+  }
+
+  .flux-diagram {
+
+    display: table;
+    width: 100%;
+
+    .reactants, .products {
+      display: table-cell;
+      vertical-align: top;
+      width: 35%;
+
+      .reactant, .product {
+
+        background-color: #eee;
+        cursor: pointer;
+        padding: 3px 0 3px 10px;
+
+        &.alternate {
+          background-color: #ccc;
+        }
+
+        &:hover, &.hover {
+          background-color: #ddd;
+        }
+      }
+    }
+
+    .flux {
+      display: table-cell;
+      width: 30%;
+    }
+
+    .flux-rect {
+      fill: red;
+    }
+    .flux-path {
+      fill: #eee;
+      cursor: pointer;
+
+      &.alternate {
+        fill: #ccc;
+      }
+
+      &:hover, &.hover {
+        fill: #ddd;
+      }
+    }
+
+  }
+
+}

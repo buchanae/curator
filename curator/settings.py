@@ -1,4 +1,5 @@
 # Django settings for curator project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -70,6 +71,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(os.path.dirname(__file__), 'static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -85,7 +87,7 @@ SECRET_KEY = 'g2@f#pca(&amp;=r!&amp;o04eii85mwm9t0q8smer&amp;pqysjnjh@y(9+@2'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    #'jingo.Loader',
+    'jingo.Loader',
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
@@ -110,6 +112,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(os.path.dirname(__file__), 'templates'),
 )
 
 INSTALLED_APPS = (

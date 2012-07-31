@@ -1,0 +1,22 @@
+{% for blueprint in blueprints %}
+  <p>{{ blueprint.name }}</p>
+  <h2>Reactions</h2>
+  <ul>
+    {% for reaction in blueprint.reactions %}
+      <li>{{ reaction.name }}
+        <h3>Reactants</h3>
+        <ul>
+          {% for reactant in reaction.reactants %}
+            <li>{{ reactant.species.name }}</li>
+          {% endfor %}
+        </ul>
+        <h3>Products</h3>
+        <ul>
+          {% for product in reaction.products %}
+            <li>{{ product.species.name }}</li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+  </ul>
+{% endfor %}

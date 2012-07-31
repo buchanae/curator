@@ -1,0 +1,34 @@
+gene-protein relationships
+==========================
+crud
+how to define in sbml?
+
+
+tools
+=====
+
+find dead end metabolites
+  produced but not consumed
+  consumed but not produced
+
+
+
+
+
+changelog
+
+fork / diff / merge
+
+users / auth
+
+
+network visualization and editing
+  be able to display subsystems
+
+
+export to sbml
+
+
+simulate
+
+web-browser sbml import / export
