@@ -1,0 +1,26 @@
+<header>
+  <h1>{{ name }}</h1>
+</header>
+
+<div class='flux-diagram'>
+
+  <div class='data'>
+    <div class='reactants'>
+    {{#stripes reactants "even" "odd"}}
+      <div class='reactant {{ stripeClass }}'>{{ species.name }}{{#format_stoichiometry stoichiometry }} <span class='stoichiometry'>x {{ stoichiometry }}</span>{{/format_stoichiometry}}</div>
+    {{else}}
+      <div class='reactant'>There are no reactants.</div>
+    {{/stripes}}
+    </div>
+
+    <div class='flux'>
+    </div>
+    <div class='products'>
+    {{#stripes products "even" "odd"}}
+      <div class='product {{ stripeClass }}'>{{#format_stoichiometry stoichiometry }}<span class='stoichiometry'>{{stoichiometry}} x</span> {{/format_stoichiometry}}{{ species.name }}</div>
+    {{else}}
+      <div class='product'>There are no products.</div>
+    {{/stripes}}
+    </div>
+  </div>
+</div>
