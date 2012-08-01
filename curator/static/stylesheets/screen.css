@@ -67,19 +67,29 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
   display: block;
 }
 
-/* line 10, ../sass/screen.scss */
+/* line 11, ../sass/screen.scss */
 header.blueprint-header {
   background-color: #bbb;
   color: #f8f8f8;
   padding: 3px 5px;
   margin-bottom: 20px;
+  overflow: hidden;
+  *zoom: 1;
 }
-/* line 16, ../sass/screen.scss */
+/* line 17, ../sass/screen.scss */
 header.blueprint-header h1 {
   font-size: 1.1em;
+  float: left;
+  width: 50%;
+}
+/* line 23, ../sass/screen.scss */
+header.blueprint-header .actions {
+  width: 40%;
+  float: right;
+  text-align: right;
 }
 
-/* line 21, ../sass/screen.scss */
+/* line 32, ../sass/screen.scss */
 #load-more {
   display: block;
   width: 80%;
@@ -87,89 +97,89 @@ header.blueprint-header h1 {
   font-size: 1.5em;
 }
 
-/* line 28, ../sass/screen.scss */
+/* line 39, ../sass/screen.scss */
 .reaction {
   width: 95%;
   margin: 20px auto;
 }
-/* line 33, ../sass/screen.scss */
+/* line 44, ../sass/screen.scss */
 .reaction header h1 {
   font-size: 1.2em;
   padding: 10px 0 5px 0;
   margin-bottom: 5px;
 }
-/* line 39, ../sass/screen.scss */
+/* line 50, ../sass/screen.scss */
 .reaction .flux-diagram {
   display: table;
   width: 100%;
 }
-/* line 44, ../sass/screen.scss */
+/* line 55, ../sass/screen.scss */
 .reaction .flux-diagram .headers, .reaction .flux-diagram .data {
   display: table-row;
 }
-/* line 48, ../sass/screen.scss */
+/* line 59, ../sass/screen.scss */
 .reaction .flux-diagram .reactants-header, .reaction .flux-diagram .products-header {
   display: table-cell;
   width: 35%;
 }
-/* line 53, ../sass/screen.scss */
+/* line 64, ../sass/screen.scss */
 .reaction .flux-diagram .reactants, .reaction .flux-diagram .products {
   display: table-cell;
   vertical-align: top;
   width: 35%;
 }
-/* line 58, ../sass/screen.scss */
+/* line 69, ../sass/screen.scss */
 .reaction .flux-diagram .reactants .reactant, .reaction .flux-diagram .reactants .product, .reaction .flux-diagram .products .reactant, .reaction .flux-diagram .products .product {
   background-color: #eee;
   cursor: pointer;
   padding: 3px 0 3px 10px;
 }
-/* line 65, ../sass/screen.scss */
+/* line 76, ../sass/screen.scss */
 .reaction .flux-diagram .reactants .reactant.odd, .reaction .flux-diagram .reactants .product.odd, .reaction .flux-diagram .products .reactant.odd, .reaction .flux-diagram .products .product.odd {
   background-color: #ddd;
 }
-/* line 69, ../sass/screen.scss */
+/* line 80, ../sass/screen.scss */
 .reaction .flux-diagram .reactants .reactant:hover, .reaction .flux-diagram .reactants .reactant.hover, .reaction .flux-diagram .reactants .product:hover, .reaction .flux-diagram .reactants .product.hover, .reaction .flux-diagram .products .reactant:hover, .reaction .flux-diagram .products .reactant.hover, .reaction .flux-diagram .products .product:hover, .reaction .flux-diagram .products .product.hover {
   background-color: #ccc;
 }
-/* line 73, ../sass/screen.scss */
+/* line 84, ../sass/screen.scss */
 .reaction .flux-diagram .reactants .reactant.header, .reaction .flux-diagram .reactants .product.header, .reaction .flux-diagram .products .reactant.header, .reaction .flux-diagram .products .product.header {
   font-size: 0.9em;
   background-color: #bbb;
   color: #eee;
 }
-/* line 82, ../sass/screen.scss */
+/* line 93, ../sass/screen.scss */
 .reaction .flux-diagram .reactant .stoichiometry,
 .reaction .flux-diagram .reactants-header .stoichiometry {
   float: right;
 }
-/* line 86, ../sass/screen.scss */
+/* line 97, ../sass/screen.scss */
 .reaction .flux-diagram .product, .reaction .flux-diagram .products-header {
   text-align: right;
 }
-/* line 89, ../sass/screen.scss */
+/* line 100, ../sass/screen.scss */
 .reaction .flux-diagram .product .stoichiometry, .reaction .flux-diagram .products-header .stoichiometry {
   float: left;
 }
-/* line 94, ../sass/screen.scss */
+/* line 105, ../sass/screen.scss */
 .reaction .flux-diagram .flux {
   display: table-cell;
   width: 30%;
 }
-/* line 99, ../sass/screen.scss */
+/* line 110, ../sass/screen.scss */
 .reaction .flux-diagram .flux-rect {
   fill: red;
 }
-/* line 102, ../sass/screen.scss */
+/* line 113, ../sass/screen.scss */
 .reaction .flux-diagram .flux-path {
   fill: #eee;
   cursor: pointer;
 }
-/* line 106, ../sass/screen.scss */
+/* line 117, ../sass/screen.scss */
 .reaction .flux-diagram .flux-path.odd {
   fill: #ddd;
 }
-/* line 110, ../sass/screen.scss */
+/* line 121, ../sass/screen.scss */
 .reaction .flux-diagram .flux-path:hover, .reaction .flux-diagram .flux-path.hover {
   fill: #ccc;
 }

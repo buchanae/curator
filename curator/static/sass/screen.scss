@@ -6,6 +6,7 @@
 @import "compass/reset";
 @import "compass";
 @import "blueprint";
+@import "compass/utilities/general/clearfix";
 
 header.blueprint-header {
   background-color: #bbb;
@@ -15,7 +16,17 @@ header.blueprint-header {
 
   h1 {
     font-size: 1.1em;
+    float: left;
+    width: 50%;
   }
+
+  .actions {
+    width: 40%;
+    float: right;
+    text-align: right;
+  }
+
+  @include clearfix;
 }
 
 #load-more {

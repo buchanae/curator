@@ -24,6 +24,10 @@
 <script type='text/html' id='blueprint_template'>
 <header class='blueprint-header'>
   <h1>{{ name }}</h1>
+  <ul class='actions'>
+    <li><a href='{{ export_uri }}'>export</a></li>
+  </ul>
+
 </header>
 
 <div class='reactions'></div>
@@ -40,7 +44,7 @@
     <div class='data'>
       <div class='reactants'>
       {{#stripes reactants "even" "odd"}}
-        <div class='reactant {{ stripeClass }}'>{{ species.name }} <span class='stoichiometry'>{{{format_stoichiometry stoichiometry }}}</span></div>
+        <div class='reactant {{ stripeClass }}'>{{ species.name }}{{#format_stoichiometry stoichiometry }} <span class='stoichiometry'>x {{ stoichiometry }}</span>{{/format_stoichiometry}}</div>
       {{else}}
         <div class='reactant'>There are no reactants.</div>
       {{/stripes}}
@@ -50,7 +54,7 @@
       </div>
       <div class='products'>
       {{#stripes products "even" "odd"}}
-        <div class='product {{ stripeClass }}'><span class='stoichiometry'>{{{format_stoichiometry stoichiometry }}}</span> {{ species.name }}</div>
+        <div class='product {{ stripeClass }}'>{{#format_stoichiometry stoichiometry }}<span class='stoichiometry'>{{stoichiometry}} x</span> {{/format_stoichiometry}}{{ species.name }}</div>
       {{else}}
         <div class='product'>There are no products.</div>
       {{/stripes}}
@@ -90,13 +94,13 @@
     }
   });
 
-  Handlebars.registerHelper('format_stoichiometry', function(s) {
+  Handlebars.registerHelper('format_stoichiometry', function(s, options) {
     if (s < 0.001) {
-      return '< 0.01';
+      return options.fn({stoichiometry: '< 0.01'});
     } else if (Math.floor(s) != s) {
-      return 'x ' + sprintf('%.3f', s);
+      return options.fn({stoichiometry: sprintf('%.3f', s)});
     } else if (s > 1) {
-      return 'x ' + s;
+      return options.fn({stoichiometry: s});
     } else {
       return '';
     }

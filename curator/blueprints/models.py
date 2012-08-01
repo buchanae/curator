@@ -1,9 +1,12 @@
 from django.db import models
+from django.core.urlresolvers import reverse
 
 
 class Blueprint(models.Model):
     name = models.CharField(max_length=100)
 
+    def export_uri(self):
+        return reverse('export', args=[self.id])
 
 # TODO better name is Compound or Molecule?
 class Species(models.Model):

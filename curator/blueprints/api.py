@@ -9,6 +9,7 @@ import models
 class BlueprintResource(ModelResource):
 
     reactions = fields.ToManyField('curator.blueprints.api.ReactionResource', 'reactions')
+    export_uri = fields.CharField(attribute='export_uri', readonly=True)
 
 # TODO something for getting set of reactions for blueprint at once
     class Meta:
