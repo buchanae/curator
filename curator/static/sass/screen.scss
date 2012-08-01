@@ -18,6 +18,13 @@ header.blueprint-header {
   }
 }
 
+#load-more {
+  display: block;
+  width: 80%;
+  margin: 20px auto;
+  font-size: 1.5em;
+}
+
 .reaction {
 
   width: 95%;
@@ -34,6 +41,15 @@ header.blueprint-header {
     display: table;
     width: 100%;
 
+    .headers, .data {
+      display: table-row;
+    }
+
+    .reactants-header, .products-header {
+      display: table-cell;
+      width: 35%;
+    }
+
     .reactants, .products {
       display: table-cell;
       vertical-align: top;
@@ -45,6 +61,7 @@ header.blueprint-header {
         cursor: pointer;
         padding: 3px 0 3px 10px;
 
+
         &.alternate {
           background-color: #ccc;
         }
@@ -52,8 +69,27 @@ header.blueprint-header {
         &:hover, &.hover {
           background-color: #ddd;
         }
+
+        &.header {
+          font-size: 0.9em;
+          background-color: #bbb;
+          color: #eee;
+        }
       }
+
     }
+    .reactant .stoichiometry,
+    .reactants-header .stoichiometry {
+      float: right;
+    }
+
+    .product, .products-header {
+      text-align: right;
+
+      .stoichiometry {
+        float: left;
+      }
+    };
 
     .flux {
       display: table-cell;

@@ -12,11 +12,13 @@
   <body>
 
   <div id='blueprint'></div>
+  <button id='load-more'>Load more</button>
 
-<script type='text/javascript' src='/static/ICanHaz.js'></script>
+<script type='text/javascript' src='/static/handlebars.js'></script>
 <script type='text/javascript' src='/static/jquery.js'></script>
 <script type='text/javascript' src='/static/underscore.js'></script>
 <script type='text/javascript' src='/static/backbone.js'></script>
+<script type='text/javascript' src='/static/sprintf.js'></script>
 
 {% raw %}
 <script type='text/html' id='blueprint_template'>
@@ -26,28 +28,63 @@
 
 <div class='reactions'></div>
 </script>
-{% endraw %}
 
-{% raw %}
+
+<script type='text/html' id='reactant_template'>
+  <div class='reactant'>{{ name }} <span class='stoichiometry'>{{{format_stoichiometry stoichiometry }}}</span></div>
+</script>
+
+
+<script type='text/html' id='product_template'>
+  <div class='product'><span class='stoichiometry'>{{{format_stoichiometry stoichiometry }}}</span> {{ name }}</div>
+</script>
+
+
 <script type='text/html' id='reaction_template'>
   <header>
     <h1>{{ name }}</h1>
   </header>
 
   <div class='flux-diagram'>
-    <div class='reactants'>
+    <div class='headers'>
+      <div class='reactants-header'>Reactant <span class='stoichiometry'>Stoichiometry</span></div>
+      <div class='flux-header'></div>
+      <div class='products-header'><span class='stoichiometry'>Stoichiometry</span> Product</div>
     </div>
 
-    <div class='flux'>
-    </div>
+    <div class='data'>
+      <div class='reactants'>
+      </div>
 
-    <div class='products'>
+      <div class='flux'>
+      </div>
+      <div class='products'>
+      </div>
     </div>
   </div>
 </script>
 {% endraw %}
 
 <script type='text/javascript'>
+
+  var blueprint_template = Handlebars.compile($('#blueprint_template').html());
+  var reactant_template = Handlebars.compile($('#reactant_template').html());
+  var product_template = Handlebars.compile($('#product_template').html());
+  var reaction_template = Handlebars.compile($('#reaction_template').html());
+
+  // TODO collapse reaction flux diagram by default
+
+  Handlebars.registerHelper('sprintf', sprintf);
+
+  Handlebars.registerHelper('format_stoichiometry', function(s) {
+    if (s < 0.001) {
+      return '< 0.01';
+    } else if (Math.floor(s) != s) {
+      return sprintf('%.3f', s);
+    } else {
+      return s;
+    }
+  });
 
   var make_svg = function(tag) {
     return document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -145,44 +182,39 @@
   });
 
   var Reaction = Backbone.Model.extend({
-    url: function() {
-      // TODO this is stupid.  not sure I like Backbone
-      return this.get('url');
-    }
   });
 
   var Species = Backbone.Model.extend({
-    url: function() {
-      // TODO this is stupid.  not sure I like Backbone
-      return this.get('url');
-    }
   });
 
-  // TODO make flux paths relative to stoichiometry
 
   var ReactionView = Backbone.View.extend({
     tagName: 'div',
     className: 'reaction',
 
     render: function() {
-      var s = ich.reaction_template(this.model.toJSON());
+      var s = reaction_template(this.model.toJSON());
       this.$el.html(s);
-      this.$el.find('.reactants');
       var that = this;
 
       _.each(this.model.get('reactants'), function(r, i) {
-        var e = $('<div class="reactant">' + r.species.name + '</div>');
-        if (i % 2 == 0) {
-          e.addClass('alternate');
-        }
+        var s = reactant_template({
+          name: r.species.name,
+          stoichiometry: r.stoichiometry,
+        });
+
+        var e = $(s);
         that.$el.find('.reactants').append(e);
       });
 
       _.each(this.model.get('products'), function(p, i) {
-        var e = $('<div class="product">' + p.species.name + '</div>');
-        if (i % 2 == 0) {
-          e.addClass('alternate');
-        }
+
+        var s = product_template({
+          name: p.species.name,
+          stoichiometry: p.stoichiometry,
+        });
+
+        var e = $(s);
         that.$el.find('.products').append(e);
       });
 
@@ -190,6 +222,16 @@
 
       return this;
     }
+  });
+
+  var ReactionCollection = Backbone.Collection.extend({
+    model: Reaction,
+    url: 'http://127.0.0.1:8000/api/v1/reaction/?format=json&blueprint=1',
+    next: '',
+    parse: function(resp) {
+      this.url = resp.meta.next;
+      return resp.objects;
+    },
   });
 
   var App = Backbone.View.extend({
@@ -200,25 +242,36 @@
       b.fetch({
         success: function(b, resp) {
 
-          var bv = $(ich.blueprint_template(b.toJSON()));
+          var bv = $(blueprint_template(b.toJSON()));
           $('#blueprint').html(bv);
 
-          var reaction_urls = b.get('reactions');
-          // TODO l = reaction_urls.length or something better (mass request)
+          // TODO bootstrap initial data
 
-          for (var i = 0, l = 50; i < l; i++) {
-            var r_url = reaction_urls[i];
-            var r = new Reaction({'url': 'http://127.0.0.1:8000' + r_url})
-            r.fetch({
-              success: function(r) {
-                var v = new ReactionView({
-                  model: r,
-                });
-                $('#blueprint .reactions').append(v.el);
-                v.render();
-              }
+          var reactions = new ReactionCollection();
+
+          var renderOne = function(m) {
+            var v = new ReactionView({
+              model: m,
             });
+            $('#blueprint .reactions').append(v.el);
+            v.render();
           };
+
+          reactions.on('add', renderOne);
+
+          reactions.on('reset', function() {
+
+            $('#blueprint .reactions').html('');
+            reactions.each(renderOne);
+          });
+
+          reactions.fetch();
+
+          $('#load-more').click(function() {
+            reactions.fetch({
+              add: true
+            });
+          });
         }
       });
     },

@@ -1,7 +1,7 @@
 from tastypie.api import Api
 from tastypie.authorization import Authorization
 from tastypie import fields
-from tastypie.resources import ModelResource
+from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
 import models
 
@@ -50,6 +50,9 @@ class ReactionResource(ModelResource):
     class Meta:
         queryset = models.Reaction.objects.all()
         authorization = Authorization()
+        filtering = {
+            'blueprint': ALL,
+        }
 
 
 api = Api(api_name='v1')
