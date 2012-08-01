@@ -10,6 +10,7 @@ from blueprints.api import api
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'curator.blueprints.views.test', name='home'),
+    url(r'^export/(\d+)/$', 'curator.blueprints.views.export', name='export'),
     # url(r'^curator/', include('curator.foo.urls')),
 
     url(r'^api/', include(api.urls)),

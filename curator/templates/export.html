@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level2" level="2" version="1" xmlns:html="http://www.w3.org/1999/xhtml">
+<model id="{{ blueprint.id }}" name="{{ blueprint.name }}">
+
+  <listOfUnitDefinitions>
+    <unitDefinition id="mmol_per_gDW_per_hr">
+      <listOfUnits>
+        <unit kind="mole" scale="-3"/>
+        <unit kind="gram" exponent="-1"/>
+        <unit kind="second" multiplier=".00027777" exponent="-1"/>
+      </listOfUnits>
+    </unitDefinition>
+  </listOfUnitDefinitions>
+
+  <listOfCompartments>
+  {% for id, name in compartments %}
+    <compartment  id="{{ id }}"  name="{{ name }}"/>
+  {% endfor %}
+  </listOfCompartments>
+
+  <listOfSpecies>
+  {% for s in species %}
+    <species  id="species_{{ s.id }}"  name="{{ s.name }}"  compartment="{{ s.compartment }}"  charge="{{ s.charge }}" boundaryCondition="false"/>
+  {% endfor %}
+  </listOfSpecies>
+
+  <listOfReactions>
+    {% for r in blueprint.reactions.all() %}
+    <reaction  id="reaction_{{ r.id }}"  name="{{ r.name }}"  reversible="{% if r.reversible %}true{% else %}false{% endif %}">
+
+      <listOfReactants>
+      {% for reactant in r.reactants.all() %}
+        <speciesReference  species="species_{{ reactant.species.id }}"  stoichiometry="{{ reactant.stoichiometry }}"/>
+      {% endfor %}
+      </listOfReactants>
+
+      <listOfProducts>
+      {% for product in r.products.all() %}
+        <speciesReference  species="species_{{ product.species.id }}"  stoichiometry="{{ product.stoichiometry }}"/>
+      {% endfor %}
+      </listOfProducts>
+
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <ci> FLUX_VALUE </ci>
+        </math>
+        <listOfParameters>
+          <parameter id="LOWER_BOUND" value="{{ r.lower_bound }}" name="mmol_per_gDW_per_hr"/>
+          <parameter id="UPPER_BOUND" value="{{ r.upper_bound }}" name="mmol_per_gDW_per_hr"/>
+          <parameter id="OBJECTIVE_COEFFICIENT" value="{{ r.objective_coefficient }}"/>
+          <parameter id="FLUX_VALUE" value="{{ r.flux_value }}" name="mmol_per_gDW_per_hr"/>
+        </listOfParameters>
+      </kineticLaw>
+    </reaction>
+    {% endfor %}
+  </listOfReactions>
+</model>
+</sbml>
