@@ -30,35 +30,30 @@
 </script>
 
 
-<script type='text/html' id='reactant_template'>
-  <div class='reactant'>{{ name }} <span class='stoichiometry'>{{{format_stoichiometry stoichiometry }}}</span></div>
-</script>
-
-
-<script type='text/html' id='product_template'>
-  <div class='product'><span class='stoichiometry'>{{{format_stoichiometry stoichiometry }}}</span> {{ name }}</div>
-</script>
-
-
 <script type='text/html' id='reaction_template'>
   <header>
     <h1>{{ name }}</h1>
   </header>
 
   <div class='flux-diagram'>
-    <div class='headers'>
-      <div class='reactants-header'>Reactant <span class='stoichiometry'>Stoichiometry</span></div>
-      <div class='flux-header'></div>
-      <div class='products-header'><span class='stoichiometry'>Stoichiometry</span> Product</div>
-    </div>
 
     <div class='data'>
       <div class='reactants'>
+      {{#stripes reactants "even" "odd"}}
+        <div class='reactant {{ stripeClass }}'>{{ species.name }} <span class='stoichiometry'>{{{format_stoichiometry stoichiometry }}}</span></div>
+      {{else}}
+        <div class='reactant'>There are no reactants.</div>
+      {{/stripes}}
       </div>
 
       <div class='flux'>
       </div>
       <div class='products'>
+      {{#stripes products "even" "odd"}}
+        <div class='product {{ stripeClass }}'><span class='stoichiometry'>{{{format_stoichiometry stoichiometry }}}</span> {{ species.name }}</div>
+      {{else}}
+        <div class='product'>There are no products.</div>
+      {{/stripes}}
       </div>
     </div>
   </div>
@@ -68,21 +63,42 @@
 <script type='text/javascript'>
 
   var blueprint_template = Handlebars.compile($('#blueprint_template').html());
-  var reactant_template = Handlebars.compile($('#reactant_template').html());
-  var product_template = Handlebars.compile($('#product_template').html());
   var reaction_template = Handlebars.compile($('#reaction_template').html());
 
   // TODO collapse reaction flux diagram by default
 
   Handlebars.registerHelper('sprintf', sprintf);
 
+  Handlebars.registerHelper("stripes", function(array, even, odd, options) {
+    if (array && array.length > 0) {
+      var buffer = "";
+      for (var i = 0, j = array.length; i < j; i++) {
+        var item = array[i];
+   
+        // we'll just put the appropriate stripe class name onto the item for now
+        item.stripeClass = (i % 2 == 0 ? even : odd);
+   
+        // show the inside of the block
+        buffer += options.fn(item);
+      }
+   
+      // return the finished buffer
+      return buffer;
+    }
+    else {
+      return options.inverse();
+    }
+  });
+
   Handlebars.registerHelper('format_stoichiometry', function(s) {
     if (s < 0.001) {
       return '< 0.01';
     } else if (Math.floor(s) != s) {
-      return sprintf('%.3f', s);
+      return 'x ' + sprintf('%.3f', s);
+    } else if (s > 1) {
+      return 'x ' + s;
     } else {
-      return s;
+      return '';
     }
   });
 
@@ -146,8 +162,8 @@
         }
 
         var cls = 'flux-path';
-        if ($(el).hasClass('alternate')) {
-          cls += ' alternate';
+        if ($(el).hasClass('odd')) {
+          cls += ' odd';
         }
         path.setAttribute('class', cls);
 
@@ -196,27 +212,6 @@
       var s = reaction_template(this.model.toJSON());
       this.$el.html(s);
       var that = this;
-
-      _.each(this.model.get('reactants'), function(r, i) {
-        var s = reactant_template({
-          name: r.species.name,
-          stoichiometry: r.stoichiometry,
-        });
-
-        var e = $(s);
-        that.$el.find('.reactants').append(e);
-      });
-
-      _.each(this.model.get('products'), function(p, i) {
-
-        var s = product_template({
-          name: p.species.name,
-          stoichiometry: p.stoichiometry,
-        });
-
-        var e = $(s);
-        that.$el.find('.products').append(e);
-      });
 
       init_reaction(this.$el);
 

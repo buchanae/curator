@@ -62,12 +62,12 @@ header.blueprint-header {
         padding: 3px 0 3px 10px;
 
 
-        &.alternate {
-          background-color: #ccc;
+        &.odd {
+          background-color: #ddd;
         }
 
         &:hover, &.hover {
-          background-color: #ddd;
+          background-color: #ccc;
         }
 
         &.header {
@@ -103,12 +103,12 @@ header.blueprint-header {
       fill: #eee;
       cursor: pointer;
 
-      &.alternate {
-        fill: #ccc;
+      &.odd {
+        fill: #ddd;
       }
 
       &:hover, &.hover {
-        fill: #ddd;
+        fill: #ccc;
       }
     }
 

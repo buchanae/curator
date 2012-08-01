@@ -125,12 +125,12 @@ header.blueprint-header h1 {
   padding: 3px 0 3px 10px;
 }
 /* line 65, ../sass/screen.scss */
-.reaction .flux-diagram .reactants .reactant.alternate, .reaction .flux-diagram .reactants .product.alternate, .reaction .flux-diagram .products .reactant.alternate, .reaction .flux-diagram .products .product.alternate {
-  background-color: #ccc;
+.reaction .flux-diagram .reactants .reactant.odd, .reaction .flux-diagram .reactants .product.odd, .reaction .flux-diagram .products .reactant.odd, .reaction .flux-diagram .products .product.odd {
+  background-color: #ddd;
 }
 /* line 69, ../sass/screen.scss */
 .reaction .flux-diagram .reactants .reactant:hover, .reaction .flux-diagram .reactants .reactant.hover, .reaction .flux-diagram .reactants .product:hover, .reaction .flux-diagram .reactants .product.hover, .reaction .flux-diagram .products .reactant:hover, .reaction .flux-diagram .products .reactant.hover, .reaction .flux-diagram .products .product:hover, .reaction .flux-diagram .products .product.hover {
-  background-color: #ddd;
+  background-color: #ccc;
 }
 /* line 73, ../sass/screen.scss */
 .reaction .flux-diagram .reactants .reactant.header, .reaction .flux-diagram .reactants .product.header, .reaction .flux-diagram .products .reactant.header, .reaction .flux-diagram .products .product.header {
@@ -166,10 +166,10 @@ header.blueprint-header h1 {
   cursor: pointer;
 }
 /* line 106, ../sass/screen.scss */
-.reaction .flux-diagram .flux-path.alternate {
-  fill: #ccc;
+.reaction .flux-diagram .flux-path.odd {
+  fill: #ddd;
 }
 /* line 110, ../sass/screen.scss */
 .reaction .flux-diagram .flux-path:hover, .reaction .flux-diagram .flux-path.hover {
-  fill: #ddd;
+  fill: #ccc;
 }
